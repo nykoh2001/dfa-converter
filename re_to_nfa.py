@@ -1,4 +1,9 @@
-from re_to_tree import constructTree
+from sys import stdin
+import re
+
+from re_to_tree import build_tree
+
+p = re.compile("[A-Za-z0-9]")
 
 
 class Type:
@@ -8,20 +13,8 @@ class Type:
     STAR = 4
 
 
-# def inorder(et):
-#     if et._type == Type.SYMBOL:
-#         print(et.value)
-#     elif et._type == Type.CONCAT:
-#         inorder(et.left)
-#         print(".")
-#         inorder(et.right)
-#     elif et._type == Type.UNION:
-#         inorder(et.left)
-#         print("+")
-#         inorder(et.right)
-#     elif et._type == Type.STAR:
-#         inorder(et.left)
-#         print("*")
+def isTerm(c):
+    return p.match(c)
 
 
 def higherPrecedence(a, b):
@@ -34,10 +27,8 @@ def postfix(regexp):
     for i in range(len(regexp)):
         if (
             i != 0
-            and (
-                regexp[i - 1].isalpha() or regexp[i - 1] == ")" or regexp[i - 1] == "*"
-            )
-            and (regexp[i].isalpha() or regexp[i] == "(")
+            and (isTerm(regexp[i - 1]) or regexp[i - 1] == ")" or regexp[i - 1] == "*")
+            and (isTerm(regexp[i]) or regexp[i] == "(")
         ):
             temp.append("•")
         temp.append(regexp[i])
@@ -47,7 +38,7 @@ def postfix(regexp):
     output = ""
 
     for c in regexp:
-        if c.isalpha():
+        if isTerm(c):
             output = output + c
             continue
 
@@ -81,90 +72,118 @@ class FiniteAutomataState:
         self.next_state = {}
 
 
-def evalRegex(et):
-    # returns equivalent E-NFA for given expression tree (representing a Regular
-    # Expression)
-    if et._type == Type.SYMBOL:
-        return evalRegexSymbol(et)
-    elif et._type == Type.CONCAT:
-        return evalRegexConcat(et)
-    elif et._type == Type.UNION:
-        return evalRegexUnion(et)
-    elif et._type == Type.STAR:
-        return evalRegexSTAR(et)
+class NFA:
+    def __init__(self):
+        self.delta_funcs: list(DeltaFunc) = []
+        self.state_set = []
+
+    def add_func(self, func):
+        self.delta_funcs.append(func)
+
+    def print_NFA(self):
+        print("StateSet = {", ", ".join(sorted(self.state_set)), "}")
+        print("DeltaFunctions = {")
+        for d in self.delta_funcs:
+            print("   ", end="")
+            d.print_delta()
+        print("}")
+        print("StartState = q000")
 
 
-def evalRegexSymbol(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
+class DeltaFunc:
+    def __init__(self, state, symbol, next_state):
+        self.state = state
+        self.symbol = symbol
+        self.next = next_state
 
-    start_state.next_state[et.value] = [end_state]
-    return start_state, end_state
-
-
-def evalRegexConcat(et):
-    left_nfa = evalRegex(et.left)
-    right_nfa = evalRegex(et.right)
-
-    left_nfa[1].next_state["ε"] = [right_nfa[0]]
-    return left_nfa[0], right_nfa[1]
+    def print_delta(self):
+        print(f"({self.state}, {self.symbol}) = {{{', '.join(self.next)}}}")
 
 
-def evalRegexUnion(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
-
-    up_nfa = evalRegex(et.left)
-    down_nfa = evalRegex(et.right)
-
-    start_state.next_state["ε"] = [up_nfa[0], down_nfa[0]]
-    up_nfa[1].next_state["ε"] = [end_state]
-    down_nfa[1].next_state["ε"] = [end_state]
-
-    return start_state, end_state
+def convert(node):
+    if node._type == Type.SYMBOL:
+        return convertSymbol(node)
+    elif node._type == Type.CONCAT:
+        return convertConcat(node)
+    elif node._type == Type.UNION:
+        return convertUnion(node)
+    elif node._type == Type.STAR:
+        return convertSTAR(node)
 
 
-def evalRegexSTAR(et):
-    start_state = FiniteAutomataState()
-    end_state = FiniteAutomataState()
+def convertSymbol(node):
+    i_state = FiniteAutomataState()
+    f_state = FiniteAutomataState()
 
-    sub_nfa = evalRegex(et.left)
-
-    start_state.next_state["ε"] = [sub_nfa[0], end_state]
-    sub_nfa[1].next_state["ε"] = [sub_nfa[0], end_state]
-
-    return start_state, end_state
+    # 심볼 -> next state가 없어 더이상 확장되지 않는 상태
+    i_state.next_state[node.value] = [f_state]
+    return i_state, f_state
 
 
-def printStateTransitions(state, states_done, symbol_table):
+def convertConcat(node):
+    # • 연산자 왼쪽의 종결 -> • 연산자 오른쪽의 시작과 연결
+    left_node = convert(node.node_0)
+    right_node = convert(node.node_1)
 
-    if state in states_done:
+    left_node[1].next_state["ε"] = [right_node[0]]
+    return left_node[0], right_node[1]
+
+
+def convertUnion(node):
+    # i, f 추가
+    i_state = FiniteAutomataState()
+    f_state = FiniteAutomataState()
+
+    upper_node = convert(node.node_0)
+    lower_node = convert(node.node_1)
+
+    # epsilon-arc 연결
+    i_state.next_state["ε"] = [upper_node[0], lower_node[0]]
+    upper_node[1].next_state["ε"] = [f_state]
+    lower_node[1].next_state["ε"] = [f_state]
+
+    return i_state, f_state
+
+
+def convertSTAR(node):
+    # i, f 추가
+    i_state = FiniteAutomataState()
+    f_state = FiniteAutomataState()
+
+    recursive_node = convert(node.node_0)
+
+    # epsilon-arc 연결
+    i_state.next_state["ε"] = [recursive_node[0], f_state]
+    recursive_node[1].next_state["ε"] = [recursive_node[0], f_state]
+
+    return i_state, f_state
+
+
+def access_states(state, visited, symbol_table):
+
+    if state in visited:
         return
 
-    states_done.append(state)
-
+    visited.append(state)
+    NFA.state_set.append("q" + str(symbol_table[state]).zfill(3))
     for symbol in list(state.next_state):
-        line_output = "q" + str(symbol_table[state]) + "\t\t" + symbol + "\t\t\t"
+        nfa_state = "q" + str(symbol_table[state]).zfill(3)
+        next_states = []
         for ns in state.next_state[symbol]:
             if ns not in symbol_table:
                 symbol_table[ns] = 1 + sorted(symbol_table.values())[-1]
-            line_output = line_output + "q" + str(symbol_table[ns]) + " "
-
-        print(line_output)
+            next_states.append("q" + str(symbol_table[ns]).zfill(3))
+        NFA.add_func(DeltaFunc(nfa_state, symbol, next_states))
         for ns in state.next_state[symbol]:
-            printStateTransitions(ns, states_done, symbol_table)
+            access_states(ns, visited, symbol_table)
 
 
-def printTransitionTable(finite_automata):
-    print("State\t\tSymbol\t\t\tNext state")
-    printStateTransitions(finite_automata[0], [], {finite_automata[0]: 0})
+re = stdin.readline().rstrip()
+processed_re = postfix(re)
+tree = build_tree(processed_re)
 
+NFA_nodes = convert(tree)
+NFA = NFA()
 
-r = input("Enter regex: ")
-pr = postfix(r)
-et = constructTree(pr)
-
-# inorder(et)
-
-fa = evalRegex(et)
-printTransitionTable(fa)
+access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0})
+NFA.print_NFA()
