@@ -1,48 +1,18 @@
 from sys import stdin
-import re
+from re_to_tree import build_tree
+from convert_nfa import convert, NFA, postfix, access_states
+from convert_dfa import DFA
 
-from node import Node
+re = stdin.readline().rstrip()
+processed_re = postfix(re)
+tree = build_tree(processed_re)
 
-string = stdin.readline()
+NFA_nodes = convert(tree)
+NFA = NFA()
 
-ops = "()+*•"
+print("nfa start node", NFA_nodes[0].next_state)
+trainsition_table = access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0}, NFA)
+NFA.print_NFA()
 
-p = re.compile("[a-zA-Z0-9]")
-
-# 축약형 전처리 : • 추가
-i = 0
-length = len(string)
-while True:
-    if string[i] in ops:
-        if string[i] == "*" and string[i + 1] not in ["+", "•", "\n"]:
-            string = string[: i + 1] + "•" + string[i + 1 :]
-            length += 1
-    elif p.match(string[i]) and string[i + 1] == "(":
-        string = string[: i + 1] + "•" + string[i + 1 :]
-        length += 1
-    elif p.match(string[i]) and p.match(string[i + 1]):
-        string = string[: i + 1] + "•" + string[i + 1 :]
-        length += 1
-    i += 1
-    if i >= length:
-        break
-print(string)
-start_node = Node(string)
-start_node.build_tree()
-print("tree building complete")
-queue = [start_node]
-print(start_node.exp)
-while queue:
-    current = queue[0]
-    del queue[0]
-    print("     ", end="")
-    if current.node_0:
-        print("node:", current.node_0.exp, end="   ")
-        queue.append(current.node_0)
-    print("      ", end="")
-    if current.operator:
-        print("op:", current.operator, end="   ")
-    print("      ", end="")
-    if current.node_1:
-        print("node:", current.node_1.exp, end="   ")
-        queue.append(current.node_1)
+DFA = DFA(NFA)
+DFA.convertDFA(DFA.start_state, [])
