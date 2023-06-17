@@ -17,6 +17,9 @@ while True:
         if string[i] == "*" and string[i + 1] not in ["+", "•", "\n"]:
             string = string[: i + 1] + "•" + string[i + 1 :]
             length += 1
+    elif p.match(string[i]) and string[i + 1] == "(":
+        string = string[: i + 1] + "•" + string[i + 1 :]
+        length += 1
     elif p.match(string[i]) and p.match(string[i + 1]):
         string = string[: i + 1] + "•" + string[i + 1 :]
         length += 1

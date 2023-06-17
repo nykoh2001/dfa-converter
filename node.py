@@ -15,10 +15,24 @@ class Node:
             return
 
         i = 0
+        paren_cnt = 0
+        if self.exp[i] == "(":
+            paren_cnt += 1
+
+            while True:
+                i += 1
+
+                if self.exp[i] == "(":
+                    paren_cnt += 1
+
+                if self.exp[i] == ")":
+                    paren_cnt -= 1
+
+                    if paren_cnt <= 0:
+                        break
+
+        temp = i
         while True:
-            if self.exp[i] == "(":
-                while self.exp[i] != ")":
-                    i += 1
 
             if self.exp[i] == "+":
                 self.node_0 = Node(self.exp[:i])
@@ -30,12 +44,8 @@ class Node:
             i += 1
             if i >= length:
                 break
-        i = 0
+        i = temp
         while True:
-            if self.exp[i] == "(":
-
-                while self.exp[i] != ")":
-                    i += 1
 
             if self.exp[i] == "•":
                 self.node_0 = Node(self.exp[:i])
@@ -47,12 +57,8 @@ class Node:
             i += 1
             if i >= length:
                 break
-        i = 0
+        i = temp
         while True:
-            if self.exp[i] == "(":
-
-                while self.exp[i] != ")":
-                    i += 1
 
             if self.exp[i] == "*":
                 self.node_0 = Node(self.exp[:i])
@@ -62,12 +68,8 @@ class Node:
             i += 1
             if i >= length:
                 break
-        i = 0
+        i = temp
         while True:
-            if self.exp[i] == "(":
-
-                while self.exp[i] != ")":
-                    i += 1
 
             if self.exp[i] == ")":
                 self.node_0 = Node(self.exp[1 : length - 1])
