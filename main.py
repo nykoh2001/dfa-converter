@@ -14,5 +14,7 @@ print("nfa start node", NFA_nodes[0].next_state)
 trainsition_table = access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0}, NFA)
 NFA.print_NFA()
 
+print()
+
 DFA = DFA(NFA)
 DFA.convertDFA(DFA.start_state, [])
