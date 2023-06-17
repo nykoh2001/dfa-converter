@@ -20,7 +20,9 @@ class DFA:
         self.naming = {}
 
     def print_DFA(self):
-        print("StateSet = {", ", ".join(sorted(self.state_set)), "}")
+        print(
+            "StateSet = {", ", ".join([self.naming[ss] for ss in self.state_set]), "}"
+        )
         print("DeltaFunctions = {")
         for d in self.delta_funcs:
             print("   ", end="")
