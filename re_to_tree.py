@@ -22,9 +22,9 @@ class Node:
         self.node_1 = None
 
 
-def build_tree(regexp):
+def build_tree(exp):
     stack = []
-    for c in regexp:
+    for c in exp:
         if isTerm(c):
             stack.append(Node(Type.SYMBOL, c))
             continue
