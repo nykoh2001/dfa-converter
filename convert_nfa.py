@@ -77,6 +77,7 @@ class NFA:
         self.delta_funcs: list(DeltaFunc) = []
         self.state_set = []
         self.symbols = set()
+        self.start_state = "q000"
 
     def add_func(self, func):
         self.delta_funcs.append(func)
@@ -179,4 +180,3 @@ def access_states(state, visited, symbol_table, NFA):
         NFA.add_func(DeltaFunc(nfa_state, symbol, next_states))
         for ns in state.next_state[symbol]:
             access_states(ns, visited, symbol_table, NFA)
-    return symbol_table
