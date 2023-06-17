@@ -1,6 +1,8 @@
 from sys import stdin
 import re
 
+from node import Node
+
 string = stdin.readline()
 
 ops = "()+*•"
@@ -21,6 +23,23 @@ while True:
     i += 1
     if i >= length:
         break
-
-
 print(string)
+start_node = Node(string)
+start_node.build_tree()
+print("tree building complete")
+queue = [start_node]
+print(start_node.exp)
+while queue:
+    current = queue[0]
+    del queue[0]
+    print("     ", end="")
+    if current.node_0:
+        print("node:", current.node_0.exp, end="   ")
+        queue.append(current.node_0)
+    print("      ", end="")
+    if current.operator:
+        print("op:", current.operator, end="   ")
+    print("      ", end="")
+    if current.node_1:
+        print("node:", current.node_1.exp, end="   ")
+        queue.append(current.node_1)
