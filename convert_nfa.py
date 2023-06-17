@@ -76,9 +76,11 @@ class NFA:
     def __init__(self):
         self.delta_funcs: list(DeltaFunc) = []
         self.state_set = []
+        self.symbols = set()
 
     def add_func(self, func):
         self.delta_funcs.append(func)
+        self.symbols.add(func.symbol)
 
     def print_NFA(self):
         print("StateSet = {", ", ".join(sorted(self.state_set)), "}")
@@ -159,13 +161,14 @@ def convertSTAR(node):
     return i_state, f_state
 
 
-def access_states(state, visited, symbol_table):
-
+def access_states(state, visited, symbol_table, NFA):
+    # dfs 알고리즘
     if state in visited:
         return
 
     visited.append(state)
     NFA.state_set.append("q" + str(symbol_table[state]).zfill(3))
+
     for symbol in list(state.next_state):
         nfa_state = "q" + str(symbol_table[state]).zfill(3)
         next_states = []
@@ -175,15 +178,5 @@ def access_states(state, visited, symbol_table):
             next_states.append("q" + str(symbol_table[ns]).zfill(3))
         NFA.add_func(DeltaFunc(nfa_state, symbol, next_states))
         for ns in state.next_state[symbol]:
-            access_states(ns, visited, symbol_table)
-
-
-re = stdin.readline().rstrip()
-processed_re = postfix(re)
-tree = build_tree(processed_re)
-
-NFA_nodes = convert(tree)
-NFA = NFA()
-
-access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0})
-NFA.print_NFA()
+            access_states(ns, visited, symbol_table, NFA)
+    return symbol_table
