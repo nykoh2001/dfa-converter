@@ -1,3 +1,6 @@
+from copy import copy
+
+
 class DeltaFunc:
     def __init__(self, state, symbol, next_state):
         self.state = state
@@ -18,58 +21,90 @@ class DFA:
         self.state_set = set()
         self.delta_funcs = []
         self.naming = {}
+        self.naming_index = 0
+
+    def add_name(self, state):
+        self.naming["q" + str(self.naming_index).zfill(3)] = state
+        self.naming_index += 1
 
     def print_DFA(self):
         print(
-            "StateSet = {", ", ".join([self.naming[ss] for ss in self.state_set]), "}"
+            "StateSet = {",
+            get_key_by_value(self.naming, self.start_state),
+            "}",
         )
         print("DeltaFunctions = {")
         for d in self.delta_funcs:
             print("   ", end="")
-            d.print_delta(self.naming[str(d.state)], self.naming[str(d.next)])
+            d.print_delta(d.state, d.next)
         print("}")
-        print("StartState = q000")
+        print("StartState = {", get_key_by_value(self.naming, self.start_state), "}")
 
-    def convertDFA(self, closure, visited):
-        equi = set()
-        if closure.issubset(set(visited)):
-            temp_sym = set()
-            for f in self.nfa_funcs:
-                if f.state in closure and f.symbol != "ε":
-                    temp_sym.add(f.symbol)
 
-            for s in temp_sym:
-                temp_next = set()
-                for f in self.nfa_funcs:
-                    if f.state in closure and f.symbol == s:
-                        for n in f.next:
-                            temp_next.add(n)
+def get_key_by_value(dict, value):
 
-                str_closure = str(closure)
-                equi = set()
-                for state in temp_next:
-                    visited.append(state)
-                    for f in self.nfa_funcs:
-                        if f.state == state and f.symbol == "ε":
-                            for n in f.next:
-                                equi.add(n)
-                temp_next = temp_next | equi
-                self.delta_funcs.append(DeltaFunc(str_closure, s, temp_next))
-                self.state_set.add(str_closure)
-                self.state_set.add(str(temp_next))
+    for key, val in dict.items():
+        if (val) == (value):
 
-                self.convertDFA(temp_next, visited)
+            return key
 
+
+def get_closure(DFA, state, visited):
+    equi = set([state])
+    visited.append(state)
+    for f in DFA.nfa_funcs:
+        if f.state == state and f.symbol == "ε":
+            for n in f.next:
+                equi.add(n)
+                equi.update(get_closure(DFA, n, visited))
+    if "q000" in equi:
+        DFA.start_state = equi
+    return equi
+
+
+def convertDFA(DFA, closure, visited):
+    temp_closure = copy(closure)
+    for state in temp_closure:
+        closure.update(get_closure(DFA, state, visited))
+
+    temp_sym = set()
+    for f in DFA.nfa_funcs:
+        if f.state in closure and f.symbol != "ε":
+            temp_sym.add(f.symbol)
+
+    for s in temp_sym:
+        temp_next = set()
+        for f in DFA.nfa_funcs:
+            if f.state in closure and f.symbol == s:
+                for n in f.next:
+                    temp_next.add(n)
+
+        next_closure = copy(temp_next)
+        for state in temp_next:
+            next_closure.update(get_closure(DFA, state, visited))
+
+        if next_closure == closure:
+            closure_num = get_key_by_value(DFA.naming, closure)
+            next_closure_num = get_key_by_value(DFA.naming, next_closure)
+            if closure_num == None:
+                DFA.add_name(closure)
+                closure_num = get_key_by_value(DFA.naming, closure)
+            if next_closure_num == None:
+                DFA.add_name(next_closure)
+                next_closure_num = get_key_by_value(DFA.naming, next_closure)
+            DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
+            DFA.state_set.add(closure_num)
+            DFA.state_set.add(next_closure_num)
             return
+        closure_num = get_key_by_value(DFA.naming, closure)
+        next_closure_num = get_key_by_value(DFA.naming, next_closure)
+        if closure_num == None:
+            DFA.add_name(closure)
+            closure_num = get_key_by_value(DFA.naming, closure)
+        if next_closure_num == None:
+            DFA.add_name(next_closure)
+            next_closure_num = get_key_by_value(DFA.naming, next_closure)
+        DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
+        DFA.state_set.add(closure_num)
 
-        for state in closure:
-            visited.append(state)
-            for f in self.nfa_funcs:
-                if f.state == state and f.symbol == "ε":
-                    for n in f.next:
-                        equi.add(n)
-        closure = closure | equi
-        closure = self.convertDFA(closure, visited)
-        state_list = list(self.state_set)
-        for i in range(len(state_list)):
-            self.naming[state_list[i]] = "q" + str(i).zfill(3)
+    convertDFA(DFA, temp_next, visited)
