@@ -38,7 +38,7 @@ class DFA:
             print("   ", end="")
             d.print_delta(d.state, d.next)
         print("}")
-        print("StartState = {", get_key_by_value(self.naming, self.start_state), "}")
+        print("StartState =", get_key_by_value(self.naming, self.start_state))
 
 
 def get_key_by_value(dict, value):
@@ -50,13 +50,15 @@ def get_key_by_value(dict, value):
 
 
 def get_closure(DFA, state, visited):
-    equi = set([state])
+    equi = set()
     visited.append(state)
     for f in DFA.nfa_funcs:
         if f.state == state and f.symbol == "ε":
+            equi = set([state])
             for n in f.next:
-                equi.add(n)
-                equi.update(get_closure(DFA, n, visited))
+                if n not in visited:
+                    equi.add(n)
+                    equi.update(get_closure(DFA, n, visited))
     if "q000" in equi:
         DFA.start_state = equi
     return equi
@@ -72,6 +74,7 @@ def convertDFA(DFA, closure, visited):
         if f.state in closure and f.symbol != "ε":
             temp_sym.add(f.symbol)
 
+    temp_next = set()
     for s in temp_sym:
         temp_next = set()
         for f in DFA.nfa_funcs:
@@ -80,6 +83,7 @@ def convertDFA(DFA, closure, visited):
                     temp_next.add(n)
 
         next_closure = copy(temp_next)
+        print("temp next:", temp_next)
         for state in temp_next:
             next_closure.update(get_closure(DFA, state, visited))
 
@@ -89,9 +93,11 @@ def convertDFA(DFA, closure, visited):
             if closure_num == None:
                 DFA.add_name(closure)
                 closure_num = get_key_by_value(DFA.naming, closure)
+                print("new state:", closure_num, "=", closure)
             if next_closure_num == None:
                 DFA.add_name(next_closure)
                 next_closure_num = get_key_by_value(DFA.naming, next_closure)
+                print("new state:", next_closure_num, "=", next_closure)
             DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
             DFA.state_set.add(closure_num)
             DFA.state_set.add(next_closure_num)
@@ -101,10 +107,12 @@ def convertDFA(DFA, closure, visited):
         if closure_num == None:
             DFA.add_name(closure)
             closure_num = get_key_by_value(DFA.naming, closure)
+            print("new state:", closure_num, "=", closure)
         if next_closure_num == None:
             DFA.add_name(next_closure)
             next_closure_num = get_key_by_value(DFA.naming, next_closure)
+            print("new state:", next_closure_num, "=", next_closure)
         DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
         DFA.state_set.add(closure_num)
 
-    convertDFA(DFA, temp_next, visited)
+        convertDFA(DFA, next_closure, visited)
