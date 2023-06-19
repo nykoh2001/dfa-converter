@@ -11,9 +11,10 @@ tree = build_tree(processed_re)
 NFA_nodes = convert(tree)
 NFA = NFA()
 
+trainsition_table = {NFA_nodes[0]: 0}
+access_states(NFA_nodes[0], [], trainsition_table, NFA)
 
-trainsition_table = access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0}, NFA)
-print("transition table", trainsition_table)
+NFA.final_state = "q" + str(trainsition_table[NFA_nodes[1]]).zfill(3)
 print("epsilon NFA")
 NFA.print_NFA()
 
