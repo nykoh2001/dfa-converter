@@ -3,6 +3,7 @@ from re_to_tree import build_tree
 from re_to_nfa import convert, NFA, postfix, access_states
 from nfa_to_dfa import DFA, convertDFA
 
+print("regular expression:", end="")
 re = stdin.readline().rstrip()
 print()
 processed_re = postfix(re)
