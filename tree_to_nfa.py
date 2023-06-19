@@ -60,7 +60,7 @@ def convertSymbol(node):
     i_state = State()
     f_state = State()
 
-    # 심볼 -> next state가 없어 더이상 확장되지 않는 상태
+    # 터미널 심볼(또는 입실론)으로 아크 연결
     i_state.next_state[node.value] = [f_state]
 
     return i_state, f_state
