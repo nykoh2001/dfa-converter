@@ -2,8 +2,9 @@ from sys import stdin
 from re_to_tree import build_tree
 from re_to_nfa import convert, NFA, postfix, access_states
 from nfa_to_dfa import DFA, convertDFA
+from recognize import recognize_string
 
-print("regular expression:", end="")
+print("정규표현:")
 re = stdin.readline().rstrip()
 print()
 processed_re = postfix(re)
@@ -27,3 +28,14 @@ print("converted DFA")
 convertDFA(DFA, DFA.start_state, [])
 print()
 DFA.print_DFA()
+
+print()
+print("인식할 문자열:")
+
+input_string = stdin.readline().rstrip()
+while True:
+    if not input_string:
+        break
+    print(recognize_string(DFA, input_string), "\n")
+    print("인식할 문자열:")
+    input_string = stdin.readline().rstrip()

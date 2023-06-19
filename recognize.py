@@ -13,7 +13,6 @@ def recognize_string(DFA, string):
                 current_state = d.next
                 break
 
-    print("current, final", current_state, final_state)
     if current_state in final_state:
         return string + " 문자열은 인식되었습니다."
     else:
