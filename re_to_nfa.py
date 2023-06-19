@@ -1,8 +1,6 @@
 from sys import stdin
 import re
 
-from re_to_tree import build_tree
-
 p = re.compile("[A-Za-z0-9]")
 
 
