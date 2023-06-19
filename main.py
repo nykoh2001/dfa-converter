@@ -35,13 +35,15 @@ convertDFA(DFA, DFA.start_state, [])
 print()
 DFA.print_DFA()
 
+
 print()
+print("정규표현:", re)
 print("인식할 문자열:")
 
 input_string = stdin.readline().rstrip()
 while True:
     if not input_string:
         break
-    print(recognize_string(DFA, input_string, re), "\n")
+    print(recognize_string(DFA, input_string), "\n")
     print("인식할 문자열:")
     input_string = stdin.readline().rstrip()
