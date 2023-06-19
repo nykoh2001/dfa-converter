@@ -30,9 +30,10 @@ class DFA:
         self.naming_index += 1
 
     def print_DFA(self):
+        self.start_state = get_key_by_value(self.naming, self.start_state)
         print(
             "StateSet = {",
-            get_key_by_value(self.naming, self.start_state),
+            self.state_set,
             "}",
         )
         print("DeltaFunctions = {")
@@ -40,7 +41,7 @@ class DFA:
             print("   ", end="")
             d.print_delta(d.state, d.next)
         print("}")
-        print("StartState =", get_key_by_value(self.naming, self.start_state))
+        print("StartState =", self.start_state)
         print("FinalStateSet = {", ", ".join(self.final_state), "}")
 
 
