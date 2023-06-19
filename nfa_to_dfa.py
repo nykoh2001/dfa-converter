@@ -83,7 +83,6 @@ def convertDFA(DFA, closure, visited):
                     temp_next.add(n)
 
         next_closure = copy(temp_next)
-        print("temp next:", temp_next)
         for state in temp_next:
             next_closure.update(get_closure(DFA, state, visited))
 
