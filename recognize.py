@@ -1,6 +1,5 @@
-def recognize_string(DFA, string):
-    print(string)
-
+def recognize_string(DFA, string, re):
+    print("정규표현:", re)
     final_state = DFA.final_state
     start_state = DFA.start_state
     delta_function = DFA.delta_funcs
@@ -8,7 +7,6 @@ def recognize_string(DFA, string):
     # naming = DFA.naming
     for c in string:
         for d in delta_function:
-            print(d.state)
             if current_state in d.state and c == d.symbol:
                 current_state = d.next
                 break
