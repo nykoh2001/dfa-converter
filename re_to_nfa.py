@@ -60,7 +60,7 @@ def postfix(regexp):
     return output
 
 
-class FiniteAutomataState:
+class State:
     def __init__(self):
         self.next_state = {}
 
@@ -108,8 +108,8 @@ def convert(node):
 
 
 def convertSymbol(node):
-    i_state = FiniteAutomataState()
-    f_state = FiniteAutomataState()
+    i_state = State()
+    f_state = State()
 
     # 심볼 -> next state가 없어 더이상 확장되지 않는 상태
     i_state.next_state[node.value] = [f_state]
@@ -128,8 +128,8 @@ def convertConcat(node):
 
 def convertUnion(node):
     # i, f 추가
-    i_state = FiniteAutomataState()
-    f_state = FiniteAutomataState()
+    i_state = State()
+    f_state = State()
 
     upper_node = convert(node.node_0)
     lower_node = convert(node.node_1)
@@ -144,8 +144,8 @@ def convertUnion(node):
 
 def convertSTAR(node):
     # i, f 추가
-    i_state = FiniteAutomataState()
-    f_state = FiniteAutomataState()
+    i_state = State()
+    f_state = State()
 
     recursive_node = convert(node.node_0)
 
@@ -159,7 +159,7 @@ def convertSTAR(node):
 def access_states(state, visited, symbol_table, NFA):
     # dfs 알고리즘
     if state in visited:
-        return
+        return symbol_table
 
     visited.append(state)
     NFA.state_set.append("q" + str(symbol_table[state]).zfill(3))
@@ -173,4 +173,4 @@ def access_states(state, visited, symbol_table, NFA):
             next_states.append("q" + str(symbol_table[ns]).zfill(3))
         NFA.add_func(DeltaFunc(nfa_state, symbol, next_states))
         for ns in state.next_state[symbol]:
-            access_states(ns, visited, symbol_table, NFA)
+            return access_states(ns, visited, symbol_table, NFA)
