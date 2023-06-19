@@ -4,8 +4,14 @@ from re_to_nfa import convert, NFA, postfix, access_states
 from nfa_to_dfa import DFA, convertDFA
 from recognize import recognize_string
 
+import re
+
+p = re.compile("[A-Za-z0-9]")
+
 print("정규표현:")
 re = stdin.readline().rstrip()
+if not p.match(re):
+    print("문자나 숫자로만 이루어진 정규 표현을 입력해주세요.")
 print()
 processed_re = postfix(re)
 tree = build_tree(processed_re)
