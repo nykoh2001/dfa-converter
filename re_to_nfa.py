@@ -71,6 +71,7 @@ class NFA:
         self.state_set = []
         self.symbols = set()
         self.start_state = "q000"
+        self.final_state = None
 
     def add_func(self, func):
         self.delta_funcs.append(func)
@@ -84,6 +85,7 @@ class NFA:
             d.print_delta()
         print("}")
         print("StartState = q000")
+        print("FinalStateSet = {", self.final_state, "}")
 
 
 class DeltaFunc:
@@ -159,7 +161,7 @@ def convertSTAR(node):
 def access_states(state, visited, symbol_table, NFA):
     # dfs 알고리즘
     if state in visited:
-        return symbol_table
+        return
 
     visited.append(state)
     NFA.state_set.append("q" + str(symbol_table[state]).zfill(3))
@@ -173,4 +175,4 @@ def access_states(state, visited, symbol_table, NFA):
             next_states.append("q" + str(symbol_table[ns]).zfill(3))
         NFA.add_func(DeltaFunc(nfa_state, symbol, next_states))
         for ns in state.next_state[symbol]:
-            return access_states(ns, visited, symbol_table, NFA)
+            access_states(ns, visited, symbol_table, NFA)

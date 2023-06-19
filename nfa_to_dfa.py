@@ -19,6 +19,7 @@ class DFA:
         self.nfa_funcs = NFA.delta_funcs
         self.start_state = set([NFA.start_state])
         self.state_set = set()
+        self.final_state = NFA.final_state
         self.delta_funcs = []
         self.naming = {}
         self.naming_index = 0
@@ -39,6 +40,7 @@ class DFA:
             d.print_delta(d.state, d.next)
         print("}")
         print("StartState =", get_key_by_value(self.naming, self.start_state))
+        print("FinalState = {", self.final_state, "}")
 
 
 def get_key_by_value(dict, value):
@@ -93,10 +95,14 @@ def convertDFA(DFA, closure, visited):
                 DFA.add_name(closure)
                 closure_num = get_key_by_value(DFA.naming, closure)
                 print("new state:", closure_num, "=", closure)
+                if DFA.final_state in closure:
+                    DFA.final_state = closure_num
             if next_closure_num == None:
                 DFA.add_name(next_closure)
                 next_closure_num = get_key_by_value(DFA.naming, next_closure)
                 print("new state:", next_closure_num, "=", next_closure)
+                if DFA.final_state in next_closure:
+                    DFA.final_state = next_closure_num
             DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
             DFA.state_set.add(closure_num)
             DFA.state_set.add(next_closure_num)
@@ -108,10 +114,14 @@ def convertDFA(DFA, closure, visited):
             DFA.add_name(closure)
             closure_num = get_key_by_value(DFA.naming, closure)
             print("new state:", closure_num, "=", closure)
+            if DFA.final_state in closure:
+                DFA.final_state = closure_num
         if next_closure_num == None:
             DFA.add_name(next_closure)
             next_closure_num = get_key_by_value(DFA.naming, next_closure)
             print("new state:", next_closure_num, "=", next_closure)
+            if DFA.final_state in next_closure:
+                DFA.final_state = next_closure_num
         DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
         DFA.state_set.add(closure_num)
 
