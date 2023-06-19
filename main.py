@@ -10,11 +10,15 @@ tree = build_tree(processed_re)
 NFA_nodes = convert(tree)
 NFA = NFA()
 
-print("nfa start node", NFA_nodes[0].next_state)
+
 trainsition_table = access_states(NFA_nodes[0], [], {NFA_nodes[0]: 0}, NFA)
+print("epsilon NFA")
 NFA.print_NFA()
 
 print()
 
+
 DFA = DFA(NFA)
+print("converted DFA")
 DFA.convertDFA(DFA.start_state, [])
+DFA.print_DFA()

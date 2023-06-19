@@ -73,5 +73,3 @@ class DFA:
         state_list = list(self.state_set)
         for i in range(len(state_list)):
             self.naming[state_list[i]] = "q" + str(i).zfill(3)
-
-        self.print_DFA()
