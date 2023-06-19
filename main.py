@@ -1,6 +1,6 @@
 from sys import stdin, exit
 from re_to_tree import build_tree, postfix
-from re_to_nfa import convert, NFA, access_states
+from tree_to_nfa import convert, NFA, access_states
 from nfa_to_dfa import DFA, convertDFA
 from recognize import recognize_string
 

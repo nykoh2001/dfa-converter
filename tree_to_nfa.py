@@ -1,4 +1,3 @@
-from sys import stdin
 import re
 
 p = re.compile("[A-Za-z0-9]")
