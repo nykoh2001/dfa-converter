@@ -97,13 +97,13 @@ class DeltaFunc:
 
 
 def convert(node):
-    if node._type == 1:
+    if node.type == 1:
         return convertSymbol(node)
-    elif node._type == 2:
+    elif node.type == 2:
         return convertConcat(node)
-    elif node._type == 3:
+    elif node.type == 3:
         return convertUnion(node)
-    elif node._type == 4:
+    elif node.type == 4:
         return convertSTAR(node)
 
 
@@ -113,6 +113,7 @@ def convertSymbol(node):
 
     # 심볼 -> next state가 없어 더이상 확장되지 않는 상태
     i_state.next_state[node.value] = [f_state]
+
     return i_state, f_state
 
 

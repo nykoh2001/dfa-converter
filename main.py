@@ -1,7 +1,7 @@
 from sys import stdin
 from re_to_tree import build_tree
-from convert_nfa import convert, NFA, postfix, access_states
-from convert_dfa import DFA
+from re_to_nfa import convert, NFA, postfix, access_states
+from nfa_to_dfa import DFA, convertDFA
 
 re = stdin.readline().rstrip()
 processed_re = postfix(re)
@@ -20,5 +20,5 @@ print()
 
 DFA = DFA(NFA)
 print("converted DFA")
-DFA.convertDFA(DFA.start_state, [])
+convertDFA(DFA, DFA.start_state, [])
 DFA.print_DFA()

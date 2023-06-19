@@ -56,10 +56,10 @@ def get_closure(DFA, state, visited):
         if f.state == state and f.symbol == "ε":
             equi = set([state])
             for n in f.next:
-                if n not in visited:
+                if n not in visited:  # 이미 다른 state인 곳 고려 x
                     equi.add(n)
                     equi.update(get_closure(DFA, n, visited))
-    if "q000" in equi:
+    if "q000" in equi:  # start state 정의
         DFA.start_state = equi
     return equi
 
@@ -87,7 +87,7 @@ def convertDFA(DFA, closure, visited):
         for state in temp_next:
             next_closure.update(get_closure(DFA, state, visited))
 
-        if next_closure == closure:
+        if next_closure == closure:  # recursive move
             closure_num = get_key_by_value(DFA.naming, closure)
             next_closure_num = get_key_by_value(DFA.naming, next_closure)
             if closure_num == None:
@@ -102,6 +102,7 @@ def convertDFA(DFA, closure, visited):
             DFA.state_set.add(closure_num)
             DFA.state_set.add(next_closure_num)
             return
+        # 가능한 다음 상태 집합을 하나의 집합으로 매칭
         closure_num = get_key_by_value(DFA.naming, closure)
         next_closure_num = get_key_by_value(DFA.naming, next_closure)
         if closure_num == None:
@@ -115,4 +116,5 @@ def convertDFA(DFA, closure, visited):
         DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
         DFA.state_set.add(closure_num)
 
+        # 다음 상태에 대한 DFA 변환 호출
         convertDFA(DFA, next_closure, visited)

@@ -8,8 +8,8 @@ def isTerm(c):
 
 
 class Node:
-    def __init__(self, _type, value=None):
-        self._type = _type
+    def __init__(self, type, value=None):
+        self.type = type
         self.value = value
         self.node_0 = None
         self.node_1 = None
