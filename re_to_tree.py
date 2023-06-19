@@ -3,13 +3,6 @@ import re
 p = re.compile("[a-zA-Z0-9]")
 
 
-class Type:
-    SYMBOL = 1
-    CONCAT = 2
-    UNION = 3
-    STAR = 4
-
-
 def isTerm(c):
     return p.match(c)
 
@@ -26,18 +19,18 @@ def build_tree(exp):
     stack = []
     for c in exp:
         if isTerm(c):
-            stack.append(Node(Type.SYMBOL, c))
+            stack.append(Node(1, c))
             continue
         elif c == "+":
-            z = Node(Type.UNION)
+            z = Node(3)
             z.node_1 = stack.pop()
             z.node_0 = stack.pop()
         elif c == "•":
-            z = Node(Type.CONCAT)
+            z = Node(2)
             z.node_1 = stack.pop()
             z.node_0 = stack.pop()
         elif c == "*":
-            z = Node(Type.STAR)
+            z = Node(4)
             z.node_0 = stack.pop()
         stack.append(z)
     return stack[0]

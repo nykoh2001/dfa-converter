@@ -6,13 +6,6 @@ from re_to_tree import build_tree
 p = re.compile("[A-Za-z0-9]")
 
 
-class Type:
-    SYMBOL = 1
-    CONCAT = 2
-    UNION = 3
-    STAR = 4
-
-
 def isTerm(c):
     return p.match(c)
 
@@ -104,13 +97,13 @@ class DeltaFunc:
 
 
 def convert(node):
-    if node._type == Type.SYMBOL:
+    if node._type == 1:
         return convertSymbol(node)
-    elif node._type == Type.CONCAT:
+    elif node._type == 2:
         return convertConcat(node)
-    elif node._type == Type.UNION:
+    elif node._type == 3:
         return convertUnion(node)
-    elif node._type == Type.STAR:
+    elif node._type == 4:
         return convertSTAR(node)
 
 
