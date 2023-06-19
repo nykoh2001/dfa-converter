@@ -8,7 +8,7 @@ def recognize_string(DFA, string):
         moved = False
         for d in delta_function:
             if current_state in d.state and c == d.symbol:
-                print(current_state, d.state, c, d.symbol)
+
                 current_state = d.next
                 moved = True
                 break
