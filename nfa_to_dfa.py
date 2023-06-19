@@ -32,9 +32,8 @@ class DFA:
     def print_DFA(self):
         self.start_state = get_key_by_value(self.naming, self.start_state)
         print(
-            "StateSet = {",
+            "StateSet =",
             self.state_set,
-            "}",
         )
         print("DeltaFunctions = {")
         for d in self.delta_funcs:
@@ -99,12 +98,14 @@ def convertDFA(DFA, closure, visited):
                 print("new state:", closure_num, "=", closure)
                 if DFA.nfa_final_state in closure:
                     DFA.final_state.append(closure_num)
+                    print(DFA.final_state)
             if next_closure_num == None:
                 DFA.add_name(next_closure)
                 next_closure_num = get_key_by_value(DFA.naming, next_closure)
                 print("new state:", next_closure_num, "=", next_closure)
                 if DFA.nfa_final_state in next_closure:
                     DFA.final_state.append(next_closure_num)
+                    print(DFA.final_state)
             DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
             DFA.state_set.add(closure_num)
             DFA.state_set.add(next_closure_num)
@@ -118,14 +119,16 @@ def convertDFA(DFA, closure, visited):
             print("new state:", closure_num, "=", closure)
             if DFA.nfa_final_state in closure:
                 DFA.final_state.append(closure_num)
+                print(DFA.final_state)
         if next_closure_num == None:
             DFA.add_name(next_closure)
             next_closure_num = get_key_by_value(DFA.naming, next_closure)
             print("new state:", next_closure_num, "=", next_closure)
             if DFA.nfa_final_state in next_closure:
                 DFA.final_state.append(next_closure_num)
+                print(DFA.final_state)
         DFA.delta_funcs.append(DeltaFunc(closure_num, s, next_closure_num))
         DFA.state_set.add(closure_num)
-
+        DFA.state_set.add(next_closure_num)
         # 다음 상태에 대한 DFA 변환 호출
         convertDFA(DFA, next_closure, visited)
