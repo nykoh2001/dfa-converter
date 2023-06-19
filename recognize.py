@@ -14,8 +14,9 @@ def recognize_string(DFA, string):
                 break
         if not moved:
             return "인식할 수 없는 문자열입니다."
-
+    if string == "":
+        string = "epsilon"
     if current_state in final_state:
-        return string + " 문자열은 인식되었습니다."
+        return string + "은 인식되었습니다."
     else:
         return "인식할 수 없는 문자열입니다."

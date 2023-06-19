@@ -43,8 +43,8 @@ print("인식할 문자열:")
 
 input_string = stdin.readline().rstrip()
 while True:
-    if input_string is "exit":
-        break
+    if input_string == "exit":
+        exit(0)
     print(recognize_string(DFA, input_string), "\n")
     print("인식할 문자열:")
     input_string = stdin.readline().rstrip()
